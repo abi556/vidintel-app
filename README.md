@@ -38,6 +38,9 @@ The app is built with **Next.js** (App Router), calls the **YouTube Data API v3*
    |----------|----------|-------------|
    | `YOUTUBE_API_KEY` | Yes | Server-only key for YouTube Data API v3 ([Google Cloud Credentials](https://console.cloud.google.com/apis/credentials)) |
    | `NEXT_PUBLIC_BASE_URL` | No | Canonical site URL for Open Graph and meta tags (defaults are suitable for Vercel deployments) |
+   | `UPSTASH_REDIS_REST_URL` | No | [Upstash Redis](https://console.upstash.com/) REST URL — enables per-IP rate limiting on `POST /api/channel` (recommended in production) |
+   | `UPSTASH_REDIS_REST_TOKEN` | No | Upstash REST token (pair with the URL above) |
+   | `RATE_LIMIT_CHANNEL_PER_MINUTE` | No | Max channel-resolve requests per IP per minute when Redis is configured (default `60`, minimum `10`) |
 
    Never expose the API key with a `NEXT_PUBLIC_` prefix.
 
@@ -103,6 +106,8 @@ The brief was an MVP with a short timeline: **paste a competitor channel URL** a
 
 **Security.** Global headers (for example `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) are applied in `next.config.ts`. The API validates input and returns structured errors suitable for the client.
 
+**Abuse and API quota.** Automated clients and scrapers cannot be distinguished perfectly from humans without interactive checks (for example a CAPTCHA). The practical approach here is **per-IP rate limiting** on the expensive `POST /api/channel` route using **Upstash Redis** when `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set. Limits are set generously so normal use (including compare mode and repeated tries) stays comfortable; sustained bot-like traffic from an address gets HTTP 429 with `Retry-After`. Without Upstash credentials, the limiter is disabled so local development does not require a database. Users behind the same NAT or corporate network share one bucket—raise `RATE_LIMIT_CHANNEL_PER_MINUTE` if that is a concern.
+
 **Progressive Web App.** Offline support and precaching are provided by `@ducanh2912/next-pwa`, which relies on Workbox’s **webpack** integration. For that reason production builds use `next build --webpack` even though local development uses Turbopack for faster iteration.
 
 **Testing.** Vitest covers pure logic and components; Playwright covers smoke flows, API error handling, manifest and security headers. Run `npm run test` and `npm run test:e2e` before releases or significant changes.
@@ -113,4 +118,4 @@ The brief was an MVP with a short timeline: **paste a competitor channel URL** a
 
 ## Deployment
 
-The app is a standard Next.js deployment. Set `YOUTUBE_API_KEY` (and optionally `NEXT_PUBLIC_BASE_URL`) in your hosting provider’s environment. Build with `npm run build` and start with `npm run start`, or use a platform such as [Vercel](https://vercel.com) with the same commands.
+The app is a standard Next.js deployment. Set `YOUTUBE_API_KEY` (and optionally `NEXT_PUBLIC_BASE_URL`) in your hosting provider’s environment. Add Upstash Redis variables in production to protect your YouTube API quota from scripted abuse. Build with `npm run build` and start with `npm run start`, or use a platform such as [Vercel](https://vercel.com) with the same commands.

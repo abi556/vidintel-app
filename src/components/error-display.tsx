@@ -25,6 +25,7 @@ const HEADINGS: Record<ApiError["code"], string> = {
   CHANNEL_NOT_FOUND: "Channel not found",
   INVALID_URL: "Invalid input",
   QUOTA_EXCEEDED: "Rate limit reached",
+  RATE_LIMITED: "Too many requests",
   API_ERROR: "YouTube API issue",
   NETWORK_ERROR: "Connection problem",
 };
@@ -42,6 +43,13 @@ function ErrorIcon({ code }: { code: ApiError["code"] }) {
         </svg>
       );
     case "QUOTA_EXCEEDED":
+      return (
+        <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      );
+    case "RATE_LIMITED":
       return (
         <svg className={cls} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="10" />

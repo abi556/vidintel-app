@@ -87,6 +87,7 @@ export interface ApiError {
     | "CHANNEL_NOT_FOUND"
     | "INVALID_URL"
     | "QUOTA_EXCEEDED"
+    | "RATE_LIMITED"
     | "API_ERROR"
     | "NETWORK_ERROR";
   message: string;

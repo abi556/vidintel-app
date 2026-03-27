@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { parseChannelInput } from "@/lib/url-parser";
+import { enforceChannelResolveRateLimit } from "@/lib/rate-limit";
 import { resolveChannel } from "@/lib/youtube/resolve-channel";
 import type { ApiError } from "@/types";
 
@@ -8,6 +9,11 @@ function errorResponse(status: number, error: ApiError) {
 }
 
 export async function POST(request: Request) {
+  const limited = await enforceChannelResolveRateLimit(request);
+  if (limited) {
+    return limited;
+  }
+
   let body: { input?: string };
 
   try {

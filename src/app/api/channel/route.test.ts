@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { NextResponse } from "next/server";
 import { POST } from "./route";
+
+const { enforceMock } = vi.hoisted(() => ({
+  enforceMock: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  enforceChannelResolveRateLimit: enforceMock,
+}));
 
 vi.mock("@/lib/url-parser", () => ({
   parseChannelInput: vi.fn(),
@@ -22,8 +31,28 @@ function makeRequest(body: unknown): Request {
 
 describe("POST /api/channel", () => {
   beforeEach(() => {
+    enforceMock.mockReset();
+    enforceMock.mockResolvedValue(null);
     vi.mocked(parseChannelInput).mockReset();
     vi.mocked(resolveChannel).mockReset();
+  });
+
+  it("returns 429 when per-IP rate limit is exceeded", async () => {
+    enforceMock.mockResolvedValueOnce(
+      NextResponse.json(
+        {
+          code: "RATE_LIMITED",
+          message: "Too many channel lookups from this connection. Please wait a minute and try again.",
+        },
+        { status: 429, headers: { "Retry-After": "45" } }
+      )
+    );
+
+    const res = await POST(makeRequest({ input: "@x" }));
+    expect(res.status).toBe(429);
+    const data = (await res.json()) as { code?: string };
+    expect(data.code).toBe("RATE_LIMITED");
+    expect(resolveChannel).not.toHaveBeenCalled();
   });
 
   it("returns channelId on valid input", async () => {
