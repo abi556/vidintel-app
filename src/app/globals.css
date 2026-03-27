@@ -65,11 +65,6 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-::selection {
-  background: var(--accent);
-  color: white;
-}
-
 :focus-visible {
   outline: none;
   outline-offset: 2px;
