@@ -12,7 +12,12 @@ const PLACEHOLDER_EXAMPLES = [
 
 const DEFAULT_PLACEHOLDER = "https://youtube.com/@mkbhd";
 
-export function SearchBar() {
+interface SearchBarProps {
+  className?: string;
+  showHint?: boolean;
+}
+
+export function SearchBar({ className, showHint = true }: SearchBarProps) {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +68,10 @@ export function SearchBar() {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
+    <form
+      onSubmit={handleSubmit}
+      className={className ?? "w-full max-w-2xl mx-auto"}
+    >
       <div className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 transition-colors focus-within:border-muted">
         <SearchIcon />
 
@@ -98,10 +106,12 @@ export function SearchBar() {
         </p>
       )}
 
-      <p className="mt-4 text-xs text-muted-foreground text-center">
-        Supports channel URLs, @handles, /user/ links, /c/ vanity URLs, and
-        raw channel IDs
-      </p>
+      {showHint && (
+        <p className="mt-4 text-xs text-muted-foreground text-center">
+          Supports channel URLs, @handles, /user/ links, /c/ vanity URLs, and
+          raw channel IDs
+        </p>
+      )}
     </form>
   );
 }

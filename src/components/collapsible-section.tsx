@@ -21,10 +21,17 @@ export function CollapsibleSection({
 
   return (
     <div className="rounded-xl border border-border bg-surface overflow-hidden">
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-surface-hover transition-colors"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((prev) => !prev);
+          }
+        }}
+        className="w-full flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-surface-hover transition-colors select-none"
         aria-expanded={open}
       >
         <div className="flex items-center gap-2">
@@ -39,12 +46,14 @@ export function CollapsibleSection({
         {headerRight && (
           <div
             onClick={(e) => e.stopPropagation()}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") e.stopPropagation(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") e.stopPropagation();
+            }}
           >
             {headerRight}
           </div>
         )}
-      </button>
+      </div>
 
       <div
         className="grid transition-[grid-template-rows] duration-200 ease-out"

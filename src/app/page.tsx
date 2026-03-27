@@ -31,23 +31,51 @@ export default function Home() {
           </div>
 
           <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl animate-fade-in-up-delay-1">
-            See which competitor videos are{" "}
-            <span className="text-accent">crushing it</span>
+            <span className="block">Analyze & compare</span>
+            <span className="block whitespace-normal sm:whitespace-nowrap">
+              YouTube channel <span className="text-accent">performance</span>
+            </span>
           </h1>
 
           <p className="max-w-xl text-lg leading-relaxed text-muted animate-fade-in-up-delay-2">
-            Paste any YouTube channel URL and instantly get performance
-            metrics, engagement rates, and trending indicators for every
-            video published this month.
+            Paste a channel URL to get key metrics, engagement, and trending
+            signals — or compare two channels side by side.
           </p>
 
           <div className="w-full animate-fade-in-up-delay-3">
-            <SearchBar />
+            <div className="mx-auto w-full max-w-3xl">
+              <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                <SearchBar
+                  className="w-full sm:flex-1 sm:max-w-none mx-0"
+                  showHint={false}
+                />
+
+                <div className="flex justify-center sm:hidden">
+                  <span className="text-xs text-muted-foreground">or</span>
+                </div>
+
+                <span className="hidden sm:inline text-xs text-muted-foreground shrink-0">
+                  or
+                </span>
+
+                <Link
+                  href="/compare"
+                  className="flex h-[52px] items-center justify-center gap-2 rounded-full border border-accent bg-surface px-6 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover cursor-pointer shrink-0"
+                >
+                  Compare
+                </Link>
+              </div>
+
+              <p className="mt-4 text-xs text-muted-foreground text-center">
+                Supports channel URLs, @handles, /user/ links, /c/ vanity URLs,
+                and raw channel IDs
+              </p>
+            </div>
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-8 text-center animate-fade-in-up-delay-3">
             <Stat value="3 units" label="API cost per scan" />
-            <Stat value="50+" label="videos analyzed" />
+            <Stat value="50K+" label="videos analyzed" />
             <Stat value="<2s" label="response time" />
           </div>
         </div>

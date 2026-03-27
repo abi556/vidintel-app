@@ -20,19 +20,21 @@ export default async function ComparePage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <Link href="/">
-            <Logo />
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="text-xs text-muted hover:text-foreground transition-colors"
-            >
-              Analyze
+      <header className="px-6 pt-4">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-center justify-between rounded-3xl border border-border bg-background/70 px-4 py-3 backdrop-blur-md shadow-sm">
+            <Link href="/">
+              <Logo />
             </Link>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                className="text-xs text-muted hover:text-foreground transition-colors"
+              >
+                Analyze
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>

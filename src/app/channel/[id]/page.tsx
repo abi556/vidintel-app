@@ -52,12 +52,19 @@ async function fetchAnalysis(channelId: string): Promise<FetchResult> {
     videos = await fetchRecentVideos(channel.uploadsPlaylistId, 90);
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
-    console.error("[Vidintel] Video fetch failed:", msg);
+    const looksLikeMissingUploadsPlaylist =
+      msg.includes("playlistId") && msg.toLowerCase().includes("cannot be found");
+
+    if (!looksLikeMissingUploadsPlaylist) {
+      console.warn("[Vidintel] Video fetch failed:", msg);
+    }
     const classified = classifyError(msg);
     if (classified.code === "QUOTA_EXCEEDED") {
       return { ok: false, error: classified };
     }
-    videoError = msg;
+    videoError = looksLikeMissingUploadsPlaylist
+      ? "This channel’s uploads playlist isn’t available, so we couldn’t list recent videos."
+      : msg;
     videos = [];
   }
 
@@ -111,12 +118,14 @@ export default async function ChannelPage({ params }: PageProps) {
 
     return (
       <div className="min-h-screen">
-        <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-            <Link href="/">
-              <Logo />
-            </Link>
-            <ThemeToggle />
+        <header className="px-6 pt-4">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex items-center justify-between rounded-3xl border border-border bg-background/70 px-4 py-3 backdrop-blur-md shadow-sm">
+              <Link href="/">
+                <Logo />
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 
@@ -139,19 +148,21 @@ export default async function ChannelPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <Link href="/">
-            <Logo />
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/compare"
-              className="text-xs text-muted hover:text-foreground transition-colors"
-            >
-              Compare
+      <header className="px-6 pt-4">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-center justify-between rounded-3xl border border-border bg-background/70 px-4 py-3 backdrop-blur-md shadow-sm">
+            <Link href="/">
+              <Logo />
             </Link>
-            <ThemeToggle />
+            <div className="flex items-center gap-3">
+              <Link
+                href="/compare"
+                className="text-xs text-muted hover:text-foreground transition-colors"
+              >
+                Compare
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -172,9 +183,10 @@ export default async function ChannelPage({ params }: PageProps) {
           </div>
         )}
 
-        <VideoList videos={data.videos} channelName={data.channel.title} />
+        <VideoList videos={data.videos} channel={data.channel} />
 
-        <footer className="border-t border-border pt-6 pb-8 text-center text-xs text-muted-foreground">
+        <footer className="pt-6 pb-10 text-center text-xs text-muted-foreground">
+          <div className="mx-auto mb-4 h-px w-24 bg-border/70" />
           Fetched {data.videoCount} videos &middot; Last updated{" "}
           {new Date(data.fetchedAt).toLocaleTimeString()} &middot;{" "}
           <Link href="/" className="text-accent hover:underline">
