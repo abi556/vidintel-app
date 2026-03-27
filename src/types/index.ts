@@ -31,7 +31,7 @@ export interface AnalysisResult {
 
 export type SortKey = "views" | "likes" | "date" | "engagement";
 export type SortDirection = "asc" | "desc";
-export type DateRange = "7d" | "30d" | "90d" | "all";
+export type DateRange = "7d" | "30d" | "60d" | "90d" | "all";
 
 export type ChannelInputType =
   | "channel_id"

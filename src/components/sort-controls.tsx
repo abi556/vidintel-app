@@ -23,7 +23,7 @@ export function SortControls({
   onSortDirectionToggle,
 }: SortControlsProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 w-full sm:w-auto">
       <label htmlFor="sort-select" className="text-xs text-muted-foreground sr-only">
         Sort by
       </label>
@@ -31,7 +31,7 @@ export function SortControls({
         id="sort-select"
         value={sortKey}
         onChange={(e) => onSortKeyChange(e.target.value as SortKey)}
-        className="h-8 rounded-lg border border-border bg-surface px-2 text-xs text-foreground outline-none cursor-pointer"
+        className="h-8 rounded-lg border border-border bg-surface px-2 text-xs text-foreground outline-none cursor-pointer flex-1 min-w-0 sm:flex-none"
       >
         {SORT_OPTIONS.map((opt) => (
           <option key={opt.key} value={opt.key}>

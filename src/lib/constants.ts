@@ -10,6 +10,7 @@ export const CACHE_TTL = {
 export const DATE_RANGE_DAYS: Record<string, number> = {
   "7d": 7,
   "30d": 30,
+  "60d": 60,
   "90d": 90,
   all: Infinity,
 };

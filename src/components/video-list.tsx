@@ -27,9 +27,15 @@ export function VideoList({ videos, channel }: VideoListProps) {
   const [sortKey, setSortKey] = useState<SortKey>("views");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [dateRange, setDateRange] = useState<DateRange>("30d");
+  const [anchorNow, setAnchorNow] = useState<number>(() => Date.now());
 
   const toggleDirection = useCallback(() => {
     setSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
+  }, []);
+
+  const handleDateRangeChange = useCallback((range: DateRange) => {
+    setDateRange(range);
+    setAnchorNow(Date.now());
   }, []);
 
   const velocityMap = useMemo(() => {
@@ -46,9 +52,9 @@ export function VideoList({ videos, channel }: VideoListProps) {
     const daysLimit = DATE_RANGE_DAYS[dateRange];
     if (daysLimit === Infinity) return videos;
 
-    const cutoff = Date.now() - daysLimit * 24 * 60 * 60 * 1000;
+    const cutoff = anchorNow - daysLimit * 24 * 60 * 60 * 1000;
     return videos.filter((v) => new Date(v.publishedAt).getTime() >= cutoff);
-  }, [videos, dateRange]);
+  }, [videos, dateRange, anchorNow]);
 
   const sorted = useMemo(() => {
     const accessor = SORT_ACCESSORS[sortKey];
@@ -73,15 +79,21 @@ export function VideoList({ videos, channel }: VideoListProps) {
             </span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <DateFilter selected={dateRange} onChange={setDateRange} />
-            <SortControls
-              sortKey={sortKey}
-              sortDirection={sortDirection}
-              onSortKeyChange={setSortKey}
-              onSortDirectionToggle={toggleDirection}
-            />
-            <ExportDropdown videos={sorted} channel={channel} />
+          <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+            <div className="w-full sm:w-auto">
+              <DateFilter selected={dateRange} onChange={handleDateRangeChange} />
+            </div>
+            <div className="w-full sm:w-auto">
+              <SortControls
+                sortKey={sortKey}
+                sortDirection={sortDirection}
+                onSortKeyChange={setSortKey}
+                onSortDirectionToggle={toggleDirection}
+              />
+            </div>
+            <div className="w-full sm:w-auto">
+              <ExportDropdown videos={sorted} channel={channel} />
+            </div>
           </div>
         </div>
 
@@ -91,10 +103,10 @@ export function VideoList({ videos, channel }: VideoListProps) {
               No videos found in this date range.
             </p>
             <button
-              onClick={() => setDateRange("all")}
+              onClick={() => handleDateRangeChange("90d")}
               className="mt-3 text-xs text-accent hover:underline cursor-pointer"
             >
-              Show all videos
+              Show 90 days
             </button>
           </div>
         ) : (

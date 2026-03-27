@@ -74,7 +74,7 @@ export default function Home() {
           </div>
 
           <div className="mt-6 grid grid-cols-3 gap-8 text-center animate-fade-in-up-delay-3">
-            <Stat value="3 units" label="API cost per scan" />
+            <Stat value="3" suffix="units" label="API cost per scan" />
             <Stat value="50K+" label="videos analyzed" />
             <Stat value="<2s" label="response time" />
           </div>
@@ -84,11 +84,34 @@ export default function Home() {
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({
+  value,
+  suffix,
+  label,
+}: {
+  value: string;
+  suffix?: string;
+  label: string;
+}) {
   return (
     <div>
-      <p className="text-2xl font-bold tracking-tight font-mono text-foreground">
-        {value}
+      <p className="text-2xl font-bold tracking-tight font-mono text-foreground whitespace-nowrap">
+        {suffix ? (
+          <>
+            {/* Mobile: keep suffix beside number, smaller type */}
+            <span className="inline-flex items-baseline gap-1 sm:hidden">
+              <span>{value}</span>
+              <span className="font-sans text-base font-semibold tracking-tight">
+                {suffix}
+              </span>
+            </span>
+
+            {/* Desktop+: keep original look (same font/size) */}
+            <span className="hidden sm:inline">{`${value} ${suffix}`}</span>
+          </>
+        ) : (
+          value
+        )}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">{label}</p>
     </div>

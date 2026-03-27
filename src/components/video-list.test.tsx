@@ -47,7 +47,7 @@ const MOCK_VIDEOS: VideoData[] = [
     id: "v3",
     title: "Old Video",
     viewCount: 50_000,
-    publishedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+    publishedAt: new Date(Date.now() - 80 * 24 * 60 * 60 * 1000).toISOString(),
   }),
 ];
 
@@ -73,9 +73,9 @@ describe("VideoList", () => {
     expect(cardTitles).not.toContain("Old Video");
   });
 
-  it("shows all videos when All is selected", () => {
+  it("shows older videos when 90d is selected", () => {
     render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
-    fireEvent.click(screen.getByText("All"));
+    fireEvent.click(screen.getByText("90 days"));
     expect(screen.getAllByText("High Views").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Low Views").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Old Video").length).toBeGreaterThanOrEqual(1);
@@ -97,7 +97,7 @@ describe("VideoList", () => {
 
   it("sorts by views descending by default", () => {
     render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
-    fireEvent.click(screen.getByText("All"));
+    fireEvent.click(screen.getByText("90 days"));
     const titles = screen
       .getAllByRole("link")
       .map((el) => el.textContent?.trim());

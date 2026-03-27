@@ -12,14 +12,15 @@ describe("DateFilter", () => {
     render(<DateFilter {...defaultProps} />);
     expect(screen.getByText("7 days")).toBeInTheDocument();
     expect(screen.getByText("30 days")).toBeInTheDocument();
+    expect(screen.getByText("60 days")).toBeInTheDocument();
     expect(screen.getByText("90 days")).toBeInTheDocument();
-    expect(screen.getByText("All")).toBeInTheDocument();
   });
 
   it("marks selected option as checked", () => {
     render(<DateFilter {...defaultProps} />);
     expect(screen.getByText("30 days")).toHaveAttribute("aria-checked", "true");
     expect(screen.getByText("7 days")).toHaveAttribute("aria-checked", "false");
+    expect(screen.getByText("60 days")).toHaveAttribute("aria-checked", "false");
   });
 
   it("calls onChange when option is clicked", () => {

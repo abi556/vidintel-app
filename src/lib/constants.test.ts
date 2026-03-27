@@ -18,6 +18,7 @@ describe("constants", () => {
   it("has correct date range mappings", () => {
     expect(DATE_RANGE_DAYS["7d"]).toBe(7);
     expect(DATE_RANGE_DAYS["30d"]).toBe(30);
+    expect(DATE_RANGE_DAYS["60d"]).toBe(60);
     expect(DATE_RANGE_DAYS["90d"]).toBe(90);
     expect(DATE_RANGE_DAYS["all"]).toBe(Infinity);
   });

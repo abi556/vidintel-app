@@ -10,13 +10,17 @@ interface DateFilterProps {
 const OPTIONS: { value: DateRange; label: string }[] = [
   { value: "7d", label: "7 days" },
   { value: "30d", label: "30 days" },
+  { value: "60d", label: "60 days" },
   { value: "90d", label: "90 days" },
-  { value: "all", label: "All" },
 ];
 
 export function DateFilter({ selected, onChange }: DateFilterProps) {
   return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label="Date range filter">
+    <div
+      className="flex flex-wrap items-center justify-center gap-1"
+      role="radiogroup"
+      aria-label="Date range filter"
+    >
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
