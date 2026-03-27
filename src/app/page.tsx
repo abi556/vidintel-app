@@ -1,10 +1,12 @@
 import { SearchBar } from "@/components/search-bar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
+import { HomeStructuredData } from "@/components/structured-data";
 
 export default function Home() {
   return (
     <>
+      <HomeStructuredData />
       <header className="flex items-center justify-between px-6 py-4">
         <Logo />
         <ThemeToggle />

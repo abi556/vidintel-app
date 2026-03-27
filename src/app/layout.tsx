@@ -16,13 +16,41 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vidintel — YouTube Competitor Video Analysis",
+  title: {
+    default: "Vidintel — YouTube Competitor Video Analysis",
+    template: "%s | Vidintel",
+  },
   description:
     "Paste any YouTube channel URL and instantly see which videos are performing best. Built for enterprise creators and agencies.",
+  keywords: [
+    "YouTube analytics",
+    "competitor analysis",
+    "video performance",
+    "engagement rate",
+    "YouTube Data API",
+  ],
+  authors: [{ name: "Vidintel" }],
+  openGraph: {
+    type: "website",
+    siteName: "Vidintel",
+    title: "Vidintel — YouTube Competitor Video Analysis",
+    description:
+      "Paste any YouTube channel URL and instantly see which videos are performing best.",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vidintel — YouTube Competitor Video Analysis",
+    description:
+      "Paste any YouTube channel URL and instantly see which videos are performing best.",
+  },
   icons: {
     icon: [{ url: "/favicon-dark.png" }],
     apple: "/favicon-dark.png",
   },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL ?? "https://vidintel-app.vercel.app"
+  ),
 };
 
 const themeScript = `

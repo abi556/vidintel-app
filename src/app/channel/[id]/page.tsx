@@ -6,6 +6,7 @@ import { VideoList } from "@/components/video-list";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ErrorDisplay } from "@/components/error-display";
+import { ChannelStructuredData } from "@/components/structured-data";
 import type { ParsedChannelInput, AnalysisResult, ApiError } from "@/types";
 
 interface PageProps {
@@ -77,9 +78,22 @@ export async function generateMetadata({ params }: PageProps) {
     const { id } = await params;
     const input: ParsedChannelInput = { type: "channel_id", value: id };
     const channel = await resolveChannel(input);
+    const title = `${channel.title} — Vidintel Analysis`;
+    const description = `Video performance analysis for ${channel.title}. ${channel.videoCount} total videos, ${channel.subscriberCount.toLocaleString()} subscribers.`;
+
     return {
-      title: `${channel.title} — Vidintel Analysis`,
-      description: `Video performance analysis for ${channel.title}. ${channel.videoCount} total videos, ${channel.subscriberCount} subscribers.`,
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: channel.thumbnailUrl ? [{ url: channel.thumbnailUrl }] : [],
+      },
+      twitter: {
+        card: "summary" as const,
+        title,
+        description,
+      },
     };
   } catch {
     return { title: "Channel Analysis — Vidintel" };
@@ -133,6 +147,12 @@ export default async function ChannelPage({ params }: PageProps) {
           <ThemeToggle />
         </div>
       </header>
+
+      <ChannelStructuredData
+        channelName={data.channel.title}
+        channelUrl={data.channel.customUrl}
+        description={`Video performance analysis for ${data.channel.title}. ${data.videoCount} videos analyzed.`}
+      />
 
       <main className="mx-auto max-w-6xl px-6 py-8 space-y-8">
         <ChannelHeader channel={data.channel} videos={data.videos} />
