@@ -135,7 +135,7 @@ export default async function ChannelPage({ params }: PageProps) {
       </header>
 
       <main className="mx-auto max-w-6xl px-6 py-8 space-y-8">
-        <ChannelHeader channel={data.channel} videoCount={data.videoCount} />
+        <ChannelHeader channel={data.channel} videos={data.videos} />
 
         {videoError && (
           <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-foreground" role="alert">
@@ -144,7 +144,7 @@ export default async function ChannelPage({ params }: PageProps) {
           </div>
         )}
 
-        <VideoList videos={data.videos} />
+        <VideoList videos={data.videos} channelName={data.channel.title} />
 
         <footer className="border-t border-border pt-6 pb-8 text-center text-xs text-muted-foreground">
           Fetched {data.videoCount} videos &middot; Last updated{" "}

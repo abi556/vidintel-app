@@ -27,9 +27,9 @@ interface VideosResponse {
 interface VideoStatsItem {
   id: string;
   statistics: {
-    viewCount: string;
-    likeCount: string;
-    commentCount: string;
+    viewCount?: string;
+    likeCount?: string;
+    commentCount?: string;
   };
 }
 
@@ -121,9 +121,9 @@ export async function fetchRecentVideos(
       const stats = statsMap.get(item.snippet.resourceId.videoId);
       if (!stats) return null;
 
-      const views = Number(stats.viewCount);
-      const likes = Number(stats.likeCount);
-      const comments = Number(stats.commentCount);
+      const views = Number(stats.viewCount ?? 0);
+      const likes = Number(stats.likeCount ?? 0);
+      const comments = Number(stats.commentCount ?? 0);
       const engagementRate = views > 0 ? (likes + comments) / views : 0;
 
       const thumb =

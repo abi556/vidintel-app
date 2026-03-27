@@ -6,9 +6,12 @@ import { DATE_RANGE_DAYS } from "@/lib/constants";
 import { SortControls } from "./sort-controls";
 import { DateFilter } from "./date-filter";
 import { VideoCard } from "./video-card";
+import { PerformanceChart } from "./performance-chart";
+import { CSVExportButton } from "./csv-export-button";
 
 interface VideoListProps {
   videos: VideoData[];
+  channelName: string;
 }
 
 const SORT_ACCESSORS: Record<SortKey, (v: VideoData) => number> = {
@@ -18,7 +21,7 @@ const SORT_ACCESSORS: Record<SortKey, (v: VideoData) => number> = {
   engagement: (v) => v.engagementRate,
 };
 
-export function VideoList({ videos }: VideoListProps) {
+export function VideoList({ videos, channelName }: VideoListProps) {
   const [sortKey, setSortKey] = useState<SortKey>("views");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [dateRange, setDateRange] = useState<DateRange>("30d");
@@ -44,45 +47,50 @@ export function VideoList({ videos }: VideoListProps) {
   }, [filtered, sortKey, sortDirection]);
 
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-foreground">
-            Videos
-          </h2>
-          <span className="text-xs text-muted-foreground">
-            {sorted.length} of {videos.length}
-          </span>
+    <div className="space-y-6">
+      <PerformanceChart videos={filtered} />
+
+      <div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-semibold text-foreground">Videos</h2>
+            <span className="text-xs text-muted-foreground">
+              {sorted.length} of {videos.length}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <DateFilter selected={dateRange} onChange={setDateRange} />
+            <SortControls
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+              onSortKeyChange={setSortKey}
+              onSortDirectionToggle={toggleDirection}
+            />
+            <CSVExportButton videos={sorted} channelName={channelName} />
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <DateFilter selected={dateRange} onChange={setDateRange} />
-          <SortControls
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-            onSortKeyChange={setSortKey}
-            onSortDirectionToggle={toggleDirection}
-          />
-        </div>
+        {sorted.length === 0 ? (
+          <div className="rounded-xl border border-border bg-surface p-12 text-center">
+            <p className="text-sm text-muted">
+              No videos found in this date range.
+            </p>
+            <button
+              onClick={() => setDateRange("all")}
+              className="mt-3 text-xs text-accent hover:underline cursor-pointer"
+            >
+              Show all videos
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sorted.map((video) => (
+              <VideoCard key={video.id} video={video} />
+            ))}
+          </div>
+        )}
       </div>
-
-      {sorted.length === 0 ? (
-        <div className="rounded-xl border border-border bg-surface p-12 text-center">
-          <p className="text-sm text-muted">No videos found in this date range.</p>
-          <button
-            onClick={() => setDateRange("all")}
-            className="mt-3 text-xs text-accent hover:underline cursor-pointer"
-          >
-            Show all videos
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sorted.map((video) => (
-            <VideoCard key={video.id} video={video} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
