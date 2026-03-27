@@ -119,3 +119,11 @@ The brief was an MVP with a short timeline: **paste a competitor channel URL** a
 ## Deployment
 
 The app is a standard Next.js deployment. Set `YOUTUBE_API_KEY` (and optionally `NEXT_PUBLIC_BASE_URL`) in your hosting provider’s environment. Add Upstash Redis variables in production to protect your YouTube API quota from scripted abuse. Build with `npm run build` and start with `npm run start`, or use a platform such as [Vercel](https://vercel.com) with the same commands.
+
+---
+
+## License
+
+This project is released under the [MIT License](LICENSE). You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions in that file. The MIT License is a permissive open-source license commonly used for libraries and applications; it keeps liability disclaimers explicit while imposing minimal restrictions.
+
+If you fork or republish the work, keep the copyright notice and license text with your distribution. Replace “Vidintel contributors” in `LICENSE` with your own name or organization if you are the sole copyright holder of your fork.
