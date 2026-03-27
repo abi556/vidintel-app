@@ -45,7 +45,7 @@ async function fetchAnalysis(channelId: string): Promise<FetchResult> {
     return { ok: false, error: classifyError(msg) };
   }
 
-  let videos;
+  let videos: import("@/types").VideoData[] = [];
   let videoError: string | undefined;
   try {
     videos = await fetchRecentVideos(channel.uploadsPlaylistId, 90);
