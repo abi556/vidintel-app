@@ -1,65 +1,58 @@
-import Image from "next/image";
+import { SearchBar } from "@/components/search-bar";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      <header className="flex items-center justify-between px-6 py-4">
+        <Logo />
+        <ThemeToggle />
+      </header>
+
+      <main className="flex flex-1 flex-col items-center justify-center px-6 pb-24">
+        <div className="relative z-10 flex flex-col items-center gap-8 text-center max-w-3xl">
+          <div className="animate-fade-in-up">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+              YouTube Data API v3 &middot; Real-time analysis
+            </span>
+          </div>
+
+          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl md:text-6xl animate-fade-in-up-delay-1">
+            See which competitor videos are{" "}
+            <span className="text-accent">crushing it</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="max-w-xl text-lg leading-relaxed text-muted animate-fade-in-up-delay-2">
+            Paste any YouTube channel URL and instantly get performance
+            metrics, engagement rates, and trending indicators for every
+            video published this month.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+          <div className="w-full animate-fade-in-up-delay-3">
+            <SearchBar />
+          </div>
+
+          <div className="mt-6 grid grid-cols-3 gap-8 text-center animate-fade-in-up-delay-3">
+            <Stat value="3 units" label="API cost per scan" />
+            <Stat value="50+" label="videos analyzed" />
+            <Stat value="<2s" label="response time" />
+          </div>
         </div>
       </main>
+    </>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <p className="text-2xl font-bold tracking-tight font-mono text-foreground">
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }
+
