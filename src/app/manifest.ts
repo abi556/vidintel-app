@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
+import { SITE_DESCRIPTION, SITE_TITLE_DEFAULT } from "@/lib/constants";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Vidintel — YouTube Competitor Video Analysis",
+    name: SITE_TITLE_DEFAULT,
     short_name: "Vidintel",
-    description:
-      "Paste any YouTube channel URL and instantly see which videos are performing best.",
+    description: SITE_DESCRIPTION,
     start_url: "/",
     display: "standalone",
     background_color: "#0f0f0f",

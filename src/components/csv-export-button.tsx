@@ -11,7 +11,7 @@ interface CSVExportButtonProps {
 
 export function CSVExportButton({ videos, channelName }: CSVExportButtonProps) {
   const handleExport = useCallback(() => {
-    const csv = videosToCSV(videos, channelName);
+    const csv = videosToCSV(videos);
     const safe = channelName.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
     downloadCSV(csv, `vidintel_${safe}_${Date.now()}.csv`);
   }, [videos, channelName]);

@@ -34,19 +34,20 @@ export function ExportDropdown({ videos, channel }: ExportDropdownProps) {
   }, [open]);
 
   const safeName = channel.title.replace(/[^a-zA-Z0-9_-]/g, "_").toLowerCase();
-  const ts = Date.now();
 
   const handleCSV = useCallback(() => {
-    const csv = videosToCSV(videos, channel.title);
+    const ts = Date.now();
+    const csv = videosToCSV(videos);
     downloadCSV(csv, `vidintel_${safeName}_${ts}.csv`);
     setOpen(false);
-  }, [videos, channel.title, safeName, ts]);
+  }, [videos, safeName]);
 
   const handleJSON = useCallback(() => {
+    const ts = Date.now();
     const json = videosToJSON(channel, videos, insights);
     downloadJSON(json, `vidintel_${safeName}_${ts}.json`);
     setOpen(false);
-  }, [videos, channel, insights, safeName, ts]);
+  }, [videos, channel, insights, safeName]);
 
   const handlePDF = useCallback(() => {
     downloadPDF(channel, videos, insights);

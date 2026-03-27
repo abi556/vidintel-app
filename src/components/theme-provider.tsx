@@ -79,6 +79,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
     const initial = stored ?? "system";
+    // Hydrate theme from localStorage once on mount (client-only).
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional mount sync
     setThemeState(initial);
     applyTheme(initial);
 

@@ -3,15 +3,28 @@ import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CompareSearch } from "@/components/compare-search";
+import { SITE_OG_IMAGE, SITE_TITLE_DEFAULT } from "@/lib/constants";
 import { CompareResults } from "./compare-results";
 
 interface PageProps {
   searchParams: Promise<{ a?: string; b?: string }>;
 }
 
+const compareDescription =
+  "Compare two YouTube channels side by side — subscribers, views, engagement, upload cadence, and more.";
+
 export const metadata = {
   title: "Compare Channels",
-  description: "Compare two YouTube channels side by side — subscribers, views, engagement, upload cadence, and more.",
+  description: compareDescription,
+  openGraph: {
+    title: "Compare Channels",
+    description: compareDescription,
+    images: [{ url: SITE_OG_IMAGE, alt: SITE_TITLE_DEFAULT }],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    images: [SITE_OG_IMAGE],
+  },
 };
 
 export default async function ComparePage({ searchParams }: PageProps) {

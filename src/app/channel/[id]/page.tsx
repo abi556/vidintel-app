@@ -7,6 +7,7 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ErrorDisplay } from "@/components/error-display";
 import { ChannelStructuredData } from "@/components/structured-data";
+import { SITE_OG_IMAGE, SITE_TITLE_DEFAULT } from "@/lib/constants";
 import type { ParsedChannelInput, AnalysisResult, ApiError } from "@/types";
 
 interface PageProps {
@@ -94,16 +95,35 @@ export async function generateMetadata({ params }: PageProps) {
       openGraph: {
         title,
         description,
-        images: channel.thumbnailUrl ? [{ url: channel.thumbnailUrl }] : [],
+        images: channel.thumbnailUrl
+          ? [{ url: channel.thumbnailUrl }]
+          : [{ url: SITE_OG_IMAGE, alt: SITE_TITLE_DEFAULT }],
       },
-      twitter: {
-        card: "summary" as const,
-        title,
-        description,
-      },
+      twitter: channel.thumbnailUrl
+        ? {
+            card: "summary" as const,
+            title,
+            description,
+            images: [channel.thumbnailUrl],
+          }
+        : {
+            card: "summary_large_image" as const,
+            title,
+            description,
+            images: [SITE_OG_IMAGE],
+          },
     };
   } catch {
-    return { title: "Channel Analysis — Vidintel" };
+    return {
+      title: "Channel Analysis — Vidintel",
+      openGraph: {
+        images: [{ url: SITE_OG_IMAGE, alt: SITE_TITLE_DEFAULT }],
+      },
+      twitter: {
+        card: "summary_large_image" as const,
+        images: [SITE_OG_IMAGE],
+      },
+    };
   }
 }
 

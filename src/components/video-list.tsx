@@ -4,12 +4,32 @@ import { useState, useMemo, useCallback } from "react";
 import type { VideoData, ChannelData, SortKey, SortDirection, DateRange } from "@/types";
 import { DATE_RANGE_DAYS } from "@/lib/constants";
 import { getViewVelocity } from "@/lib/analytics";
+import {
+  applyListFilters,
+  type PerformanceFloorMode,
+} from "@/lib/video-filters";
 import { SortControls } from "./sort-controls";
 import { DateFilter } from "./date-filter";
+import { VideoListFilters } from "./video-list-filters";
 import { VideoCard } from "./video-card";
 import { PerformanceChart } from "./performance-chart";
 import { InsightsPanel } from "./insights-panel";
 import { ExportDropdown } from "./export-dropdown";
+
+function parseMinViews(raw: string): number | null {
+  const t = raw.trim().replace(/,/g, "");
+  if (!t) return null;
+  const n = Number.parseInt(t, 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function parseMinEngagementRatePercent(raw: string): number | null {
+  const t = raw.trim().replace(",", ".");
+  if (!t) return null;
+  const n = Number.parseFloat(t);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.min(n / 100, 1);
+}
 
 interface VideoListProps {
   videos: VideoData[];
@@ -28,6 +48,13 @@ export function VideoList({ videos, channel }: VideoListProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [dateRange, setDateRange] = useState<DateRange>("30d");
   const [anchorNow, setAnchorNow] = useState<number>(() => Date.now());
+  const [titleQuery, setTitleQuery] = useState("");
+  const [trendingOnly, setTrendingOnly] = useState(false);
+  const [performanceMode, setPerformanceMode] =
+    useState<PerformanceFloorMode>("all");
+  const [minViewsInput, setMinViewsInput] = useState("");
+  const [minEngagementPercentInput, setMinEngagementPercentInput] =
+    useState("");
 
   const toggleDirection = useCallback(() => {
     setSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
@@ -48,7 +75,7 @@ export function VideoList({ videos, channel }: VideoListProps) {
     return map;
   }, [videos]);
 
-  const filtered = useMemo(() => {
+  const dateFiltered = useMemo(() => {
     const daysLimit = DATE_RANGE_DAYS[dateRange];
     if (daysLimit === Infinity) return videos;
 
@@ -56,22 +83,51 @@ export function VideoList({ videos, channel }: VideoListProps) {
     return videos.filter((v) => new Date(v.publishedAt).getTime() >= cutoff);
   }, [videos, dateRange, anchorNow]);
 
+  const listFiltered = useMemo(() => {
+    const minViews = parseMinViews(minViewsInput);
+    const minEngagementRate = parseMinEngagementRatePercent(
+      minEngagementPercentInput
+    );
+    return applyListFilters(dateFiltered, {
+      titleQuery,
+      trendingOnly,
+      performanceMode,
+      minViews,
+      minEngagementRate,
+    });
+  }, [
+    dateFiltered,
+    titleQuery,
+    trendingOnly,
+    performanceMode,
+    minViewsInput,
+    minEngagementPercentInput,
+  ]);
+
   const sorted = useMemo(() => {
     const accessor = SORT_ACCESSORS[sortKey];
     const multiplier = sortDirection === "desc" ? -1 : 1;
-    return [...filtered].sort(
+    return [...listFiltered].sort(
       (a, b) => multiplier * (accessor(a) - accessor(b))
     );
-  }, [filtered, sortKey, sortDirection]);
+  }, [listFiltered, sortKey, sortDirection]);
+
+  const clearListFilters = useCallback(() => {
+    setTitleQuery("");
+    setTrendingOnly(false);
+    setPerformanceMode("all");
+    setMinViewsInput("");
+    setMinEngagementPercentInput("");
+  }, []);
 
   return (
     <div className="space-y-6">
       <InsightsPanel videos={videos} />
 
-      <PerformanceChart videos={filtered} />
+      <PerformanceChart videos={dateFiltered} />
 
       <div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
           <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold text-foreground">Videos</h2>
             <span className="text-xs text-muted-foreground">
@@ -97,16 +153,44 @@ export function VideoList({ videos, channel }: VideoListProps) {
           </div>
         </div>
 
-        {sorted.length === 0 ? (
+        <VideoListFilters
+          titleQuery={titleQuery}
+          onTitleQueryChange={setTitleQuery}
+          trendingOnly={trendingOnly}
+          onTrendingOnlyChange={setTrendingOnly}
+          performanceMode={performanceMode}
+          onPerformanceModeChange={setPerformanceMode}
+          minViewsInput={minViewsInput}
+          onMinViewsInputChange={setMinViewsInput}
+          minEngagementPercentInput={minEngagementPercentInput}
+          onMinEngagementPercentInputChange={setMinEngagementPercentInput}
+        />
+
+        {dateFiltered.length === 0 ? (
           <div className="rounded-xl border border-border bg-surface p-12 text-center">
             <p className="text-sm text-muted">
               No videos found in this date range.
             </p>
             <button
+              type="button"
               onClick={() => handleDateRangeChange("90d")}
               className="mt-3 text-xs text-accent hover:underline cursor-pointer"
             >
               Show 90 days
+            </button>
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="rounded-xl border border-border bg-surface p-12 text-center">
+            <p className="text-sm text-muted">
+              No videos match your filters. Try widening the search or turning
+              off some options.
+            </p>
+            <button
+              type="button"
+              onClick={clearListFilters}
+              className="mt-3 text-xs text-accent hover:underline cursor-pointer"
+            >
+              Clear filters
             </button>
           </div>
         ) : (

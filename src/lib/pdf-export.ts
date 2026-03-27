@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import type { ChannelData, VideoData, ChannelInsights } from "@/types";
+import { PRODUCT_DESCRIPTOR } from "@/lib/constants";
 import { formatCompact } from "./formatters";
 
 const ACCENT: [number, number, number] = [255, 0, 0];
@@ -21,7 +22,7 @@ export function generatePDF(
   doc.text("VIDINTEL", 14, y);
   doc.setFontSize(9);
   doc.setTextColor(...MUTED);
-  doc.text("YouTube Competitor Video Analysis", 48, y);
+  doc.text(PRODUCT_DESCRIPTOR, 48, y);
 
   const dateStr = new Date().toLocaleDateString("en-US", {
     year: "numeric",

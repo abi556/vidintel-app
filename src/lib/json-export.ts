@@ -1,10 +1,12 @@
 import type { ChannelData, VideoData, ChannelInsights } from "@/types";
+import { PRODUCT_DESCRIPTOR } from "@/lib/constants";
 
 interface ExportPayload {
   meta: {
     exportedAt: string;
     generator: string;
     version: string;
+    productTagline: string;
   };
   channel: {
     id: string;
@@ -54,6 +56,7 @@ export function videosToJSON(
       exportedAt: new Date().toISOString(),
       generator: "Vidintel",
       version: "1.0.0",
+      productTagline: PRODUCT_DESCRIPTOR,
     },
     channel: {
       id: channel.id,

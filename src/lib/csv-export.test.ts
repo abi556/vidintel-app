@@ -29,7 +29,7 @@ const MOCK_VIDEOS: VideoData[] = [
 
 describe("videosToCSV", () => {
   it("includes header row", () => {
-    const csv = videosToCSV(MOCK_VIDEOS, "TestChannel");
+    const csv = videosToCSV(MOCK_VIDEOS);
     const firstLine = csv.split("\n")[0];
     expect(firstLine).toBe(
       "Title,Video ID,Published,Views,Likes,Comments,Engagement Rate,Trending,URL"
@@ -37,13 +37,13 @@ describe("videosToCSV", () => {
   });
 
   it("includes correct number of data rows", () => {
-    const csv = videosToCSV(MOCK_VIDEOS, "TestChannel");
+    const csv = videosToCSV(MOCK_VIDEOS);
     const lines = csv.split("\n");
     expect(lines).toHaveLength(3);
   });
 
   it("formats video data correctly", () => {
-    const csv = videosToCSV(MOCK_VIDEOS, "TestChannel");
+    const csv = videosToCSV(MOCK_VIDEOS);
     const lines = csv.split("\n");
     expect(lines[1]).toContain("First Video");
     expect(lines[1]).toContain("v1");
@@ -54,18 +54,18 @@ describe("videosToCSV", () => {
   });
 
   it("escapes fields with commas and quotes", () => {
-    const csv = videosToCSV(MOCK_VIDEOS, "TestChannel");
+    const csv = videosToCSV(MOCK_VIDEOS);
     const lines = csv.split("\n");
     expect(lines[2]).toContain('"Title with ""quotes"" and, commas"');
   });
 
   it("formats date as YYYY-MM-DD", () => {
-    const csv = videosToCSV(MOCK_VIDEOS, "TestChannel");
+    const csv = videosToCSV(MOCK_VIDEOS);
     expect(csv).toContain("2026-03-20");
   });
 
   it("returns header only for empty array", () => {
-    const csv = videosToCSV([], "TestChannel");
+    const csv = videosToCSV([]);
     const lines = csv.split("\n");
     expect(lines).toHaveLength(1);
   });

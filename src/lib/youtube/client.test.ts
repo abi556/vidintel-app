@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Mock } from "vitest";
 import { youtubeGet } from "./client";
 
 describe("youtubeGet", () => {
@@ -9,14 +10,15 @@ describe("youtubeGet", () => {
 
   it("calls the correct YouTube API URL with key and params", async () => {
     const mockResponse = { items: [] };
-    global.fetch = vi.fn().mockResolvedValue({
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockResponse),
     });
+    global.fetch = fetchMock as typeof fetch;
 
     await youtubeGet("channels", { id: "UC123", part: "snippet" });
 
-    const calledUrl = new URL((global.fetch as any).mock.calls[0][0]);
+    const calledUrl = new URL(String((fetchMock as Mock).mock.calls[0][0]));
     expect(calledUrl.origin + calledUrl.pathname).toBe(
       "https://www.googleapis.com/youtube/v3/channels"
     );
@@ -26,26 +28,32 @@ describe("youtubeGet", () => {
   });
 
   it("passes Next.js revalidate option to fetch", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ items: [] }),
     });
+    global.fetch = fetchMock as typeof fetch;
 
     await youtubeGet("channels", { id: "UC123" }, { revalidate: 3600 });
 
-    const fetchOptions = (global.fetch as any).mock.calls[0][1];
+    const fetchOptions = (fetchMock as Mock).mock.calls[0][1] as {
+      next: { revalidate: number };
+    };
     expect(fetchOptions.next.revalidate).toBe(3600);
   });
 
   it("defaults to VIDEO_DATA cache TTL when no revalidate specified", async () => {
-    global.fetch = vi.fn().mockResolvedValue({
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ items: [] }),
     });
+    global.fetch = fetchMock as typeof fetch;
 
     await youtubeGet("channels", { id: "UC123" });
 
-    const fetchOptions = (global.fetch as any).mock.calls[0][1];
+    const fetchOptions = (fetchMock as Mock).mock.calls[0][1] as {
+      next: { revalidate: number };
+    };
     expect(fetchOptions.next.revalidate).toBe(300);
   });
 

@@ -1,5 +1,9 @@
+import { SITE_DESCRIPTION, SITE_OG_IMAGE } from "@/lib/constants";
+
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? "https://vidintel-app.vercel.app";
+
+const siteImageUrl = new URL(SITE_OG_IMAGE, `${BASE_URL}/`).href;
 
 export function HomeStructuredData() {
   const jsonLd = {
@@ -7,8 +11,8 @@ export function HomeStructuredData() {
     "@type": "WebApplication",
     name: "Vidintel",
     url: BASE_URL,
-    description:
-      "Paste any YouTube channel URL and instantly see which videos are performing best. Built for enterprise creators and agencies.",
+    description: SITE_DESCRIPTION,
+    image: siteImageUrl,
     applicationCategory: "AnalyticsApplication",
     operatingSystem: "Any",
     offers: {

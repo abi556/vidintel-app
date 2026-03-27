@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import {
+  SITE_DESCRIPTION,
+  SITE_OG_IMAGE,
+  SITE_TITLE_DEFAULT,
+} from "@/lib/constants";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -16,15 +21,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  applicationName: "Vidintel",
   title: {
-    default: "Vidintel — YouTube Competitor Video Analysis",
+    default: SITE_TITLE_DEFAULT,
     template: "%s | Vidintel",
   },
-  description:
-    "Paste any YouTube channel URL and instantly see which videos are performing best. Built for enterprise creators and agencies.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "YouTube analytics",
-    "competitor analysis",
+    "channel performance",
+    "YouTube channel performance",
     "video performance",
     "engagement rate",
     "YouTube Data API",
@@ -33,16 +39,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Vidintel",
-    title: "Vidintel — YouTube Competitor Video Analysis",
-    description:
-      "Paste any YouTube channel URL and instantly see which videos are performing best.",
+    title: SITE_TITLE_DEFAULT,
+    description: SITE_DESCRIPTION,
     locale: "en_US",
+    images: [
+      {
+        url: SITE_OG_IMAGE,
+        alt: SITE_TITLE_DEFAULT,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vidintel — YouTube Competitor Video Analysis",
-    description:
-      "Paste any YouTube channel URL and instantly see which videos are performing best.",
+    title: SITE_TITLE_DEFAULT,
+    description: SITE_DESCRIPTION,
+    images: [SITE_OG_IMAGE],
   },
   icons: {
     icon: [{ url: "/favicon-dark.png" }],

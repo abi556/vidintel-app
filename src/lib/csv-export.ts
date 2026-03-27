@@ -19,7 +19,7 @@ function escapeField(value: string): string {
   return value;
 }
 
-export function videosToCSV(videos: VideoData[], channelName: string): string {
+export function videosToCSV(videos: VideoData[]): string {
   const rows = videos.map((v) =>
     [
       escapeField(v.title),

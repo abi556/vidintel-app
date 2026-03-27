@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { PRODUCT_DESCRIPTOR } from "@/lib/constants";
 import { videosToJSON } from "./json-export";
 import type { ChannelData, VideoData, ChannelInsights } from "@/types";
 
@@ -39,6 +40,7 @@ describe("videosToJSON", () => {
     const parsed = JSON.parse(json);
     expect(parsed.meta).toBeDefined();
     expect(parsed.meta.generator).toBe("Vidintel");
+    expect(parsed.meta.productTagline).toBe(PRODUCT_DESCRIPTOR);
     expect(parsed.channel.title).toBe("Test Channel");
     expect(parsed.videos).toHaveLength(1);
     expect(parsed.videos[0].url).toContain("youtube.com");

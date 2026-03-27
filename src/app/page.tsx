@@ -26,7 +26,7 @@ export default function Home() {
           <div className="animate-fade-in-up">
             <span className="inline-flex items-center gap-2 text-xs font-medium text-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              YouTube Data API v3 &middot; Real-time analysis
+              YouTube &middot; Real-time analysis
             </span>
           </div>
 

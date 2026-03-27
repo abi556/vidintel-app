@@ -28,20 +28,14 @@ export async function CompareResults({
   channelIdA,
   channelIdB,
 }: CompareResultsProps) {
+  let resultA: ChannelResult;
+  let resultB: ChannelResult;
+
   try {
-    const [resultA, resultB] = await Promise.all([
+    [resultA, resultB] = await Promise.all([
       fetchChannel(channelIdA),
       fetchChannel(channelIdB),
     ]);
-
-    return (
-      <CompareView
-        channelA={resultA.channel}
-        videosA={resultA.videos}
-        channelB={resultB.channel}
-        videosB={resultB.videos}
-      />
-    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     const isQuota = message.includes("403");
@@ -65,4 +59,13 @@ export async function CompareResults({
       </div>
     );
   }
+
+  return (
+    <CompareView
+      channelA={resultA.channel}
+      videosA={resultA.videos}
+      channelB={resultB.channel}
+      videosB={resultB.videos}
+    />
+  );
 }
