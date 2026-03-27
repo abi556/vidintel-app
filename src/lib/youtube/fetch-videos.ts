@@ -3,7 +3,7 @@ import { MAX_RESULTS_PER_PAGE } from "@/lib/constants";
 import type { VideoData } from "@/types";
 
 interface PlaylistItemsResponse {
-  items: PlaylistItem[];
+  items?: PlaylistItem[];
   nextPageToken?: string;
 }
 
@@ -12,12 +12,16 @@ interface PlaylistItem {
     publishedAt: string;
     title: string;
     resourceId: { videoId: string };
-    thumbnails: { high: { url: string } };
+    thumbnails: {
+      high?: { url: string };
+      medium?: { url: string };
+      default?: { url: string };
+    };
   };
 }
 
 interface VideosResponse {
-  items: VideoStatsItem[];
+  items?: VideoStatsItem[];
 }
 
 interface VideoStatsItem {
@@ -29,15 +33,30 @@ interface VideoStatsItem {
   };
 }
 
+const STATS_BATCH_SIZE = 50;
+
+function chunk<T>(arr: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    result.push(arr.slice(i, i + size));
+  }
+  return result;
+}
+
 export async function fetchRecentVideos(
   uploadsPlaylistId: string,
   days: number
 ): Promise<VideoData[]> {
+  if (!uploadsPlaylistId) {
+    console.warn("[Vidintel] No uploads playlist ID — skipping video fetch");
+    return [];
+  }
+
   const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   const recentItems: PlaylistItem[] = [];
   let pageToken: string | undefined;
+  let pageCount = 0;
 
-  // Paginate through playlistItems until we hit videos older than cutoff
   do {
     const params: Record<string, string> = {
       playlistId: uploadsPlaylistId,
@@ -51,7 +70,14 @@ export async function fetchRecentVideos(
       params
     );
 
-    if (!data.items?.length) break;
+    pageCount++;
+
+    if (!data.items?.length) {
+      console.warn(
+        `[Vidintel] playlistItems page ${pageCount} returned 0 items for ${uploadsPlaylistId}`
+      );
+      break;
+    }
 
     let hitOldVideo = false;
     for (const item of data.items) {
@@ -68,18 +94,28 @@ export async function fetchRecentVideos(
     pageToken = data.nextPageToken;
   } while (pageToken);
 
+  console.info(
+    `[Vidintel] Found ${recentItems.length} videos in last ${days}d for ${uploadsPlaylistId} (${pageCount} API pages)`
+  );
+
   if (recentItems.length === 0) return [];
 
-  // Batch fetch video statistics
   const videoIds = recentItems.map((i) => i.snippet.resourceId.videoId);
-  const statsData = await youtubeGet<VideosResponse>("videos", {
-    id: videoIds.join(","),
-    part: "statistics",
-  });
+  const batches = chunk(videoIds, STATS_BATCH_SIZE);
+  const statsMap = new Map<string, VideoStatsItem["statistics"]>();
 
-  const statsMap = new Map(statsData.items.map((s) => [s.id, s.statistics]));
+  for (const batch of batches) {
+    const statsData = await youtubeGet<VideosResponse>("videos", {
+      id: batch.join(","),
+      part: "statistics",
+    });
+    if (statsData.items) {
+      for (const s of statsData.items) {
+        statsMap.set(s.id, s.statistics);
+      }
+    }
+  }
 
-  // Build VideoData array
   const videos: VideoData[] = recentItems
     .map((item) => {
       const stats = statsMap.get(item.snippet.resourceId.videoId);
@@ -90,11 +126,18 @@ export async function fetchRecentVideos(
       const comments = Number(stats.commentCount);
       const engagementRate = views > 0 ? (likes + comments) / views : 0;
 
+      const thumb =
+        item.snippet.thumbnails.high ??
+        item.snippet.thumbnails.medium ??
+        item.snippet.thumbnails.default;
+
       return {
         id: item.snippet.resourceId.videoId,
         title: item.snippet.title,
         publishedAt: item.snippet.publishedAt,
-        thumbnailUrl: item.snippet.thumbnails.high.url,
+        thumbnailUrl:
+          thumb?.url ??
+          `https://i.ytimg.com/vi/${item.snippet.resourceId.videoId}/hqdefault.jpg`,
         viewCount: views,
         likeCount: likes,
         commentCount: comments,
@@ -104,7 +147,6 @@ export async function fetchRecentVideos(
     })
     .filter((v): v is VideoData => v !== null);
 
-  // Mark trending: above average views
   if (videos.length > 0) {
     const avgViews =
       videos.reduce((sum, v) => sum + v.viewCount, 0) / videos.length;

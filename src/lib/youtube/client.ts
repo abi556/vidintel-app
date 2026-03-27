@@ -25,8 +25,14 @@ export async function youtubeGet<T>(
   const res = await fetch(url.toString(), {
     next: { revalidate },
   });
+
   if (!res.ok) {
-    throw new Error(`YouTube API ${res.status}: ${res.statusText}`);
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      detail = body?.error?.message ?? JSON.stringify(body?.error ?? body);
+    } catch {}
+    throw new Error(`YouTube API ${res.status}: ${detail}`);
   }
 
   return res.json();
