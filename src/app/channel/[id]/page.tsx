@@ -144,7 +144,15 @@ export default async function ChannelPage({ params }: PageProps) {
           <Link href="/">
             <Logo />
           </Link>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <Link
+              href="/compare"
+              className="text-xs text-muted hover:text-foreground transition-colors"
+            >
+              Compare
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

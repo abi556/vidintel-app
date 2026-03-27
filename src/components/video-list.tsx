@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import type { VideoData, SortKey, SortDirection, DateRange } from "@/types";
+import type { VideoData, ChannelData, SortKey, SortDirection, DateRange } from "@/types";
 import { DATE_RANGE_DAYS } from "@/lib/constants";
+import { getViewVelocity } from "@/lib/analytics";
 import { SortControls } from "./sort-controls";
 import { DateFilter } from "./date-filter";
 import { VideoCard } from "./video-card";
 import { PerformanceChart } from "./performance-chart";
-import { CSVExportButton } from "./csv-export-button";
+import { InsightsPanel } from "./insights-panel";
+import { ExportDropdown } from "./export-dropdown";
 
 interface VideoListProps {
   videos: VideoData[];
-  channelName: string;
+  channel: ChannelData;
 }
 
 const SORT_ACCESSORS: Record<SortKey, (v: VideoData) => number> = {
@@ -21,7 +23,7 @@ const SORT_ACCESSORS: Record<SortKey, (v: VideoData) => number> = {
   engagement: (v) => v.engagementRate,
 };
 
-export function VideoList({ videos, channelName }: VideoListProps) {
+export function VideoList({ videos, channel }: VideoListProps) {
   const [sortKey, setSortKey] = useState<SortKey>("views");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [dateRange, setDateRange] = useState<DateRange>("30d");
@@ -29,6 +31,16 @@ export function VideoList({ videos, channelName }: VideoListProps) {
   const toggleDirection = useCallback(() => {
     setSortDirection((prev) => (prev === "desc" ? "asc" : "desc"));
   }, []);
+
+  const velocityMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (videos.length > 0) {
+      for (const v of getViewVelocity(videos)) {
+        map.set(v.id, v.velocity);
+      }
+    }
+    return map;
+  }, [videos]);
 
   const filtered = useMemo(() => {
     const daysLimit = DATE_RANGE_DAYS[dateRange];
@@ -48,6 +60,8 @@ export function VideoList({ videos, channelName }: VideoListProps) {
 
   return (
     <div className="space-y-6">
+      <InsightsPanel videos={videos} />
+
       <PerformanceChart videos={filtered} />
 
       <div>
@@ -67,7 +81,7 @@ export function VideoList({ videos, channelName }: VideoListProps) {
               onSortKeyChange={setSortKey}
               onSortDirectionToggle={toggleDirection}
             />
-            <CSVExportButton videos={sorted} channelName={channelName} />
+            <ExportDropdown videos={sorted} channel={channel} />
           </div>
         </div>
 
@@ -86,7 +100,11 @@ export function VideoList({ videos, channelName }: VideoListProps) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {sorted.map((video) => (
-              <VideoCard key={video.id} video={video} />
+              <VideoCard
+                key={video.id}
+                video={video}
+                velocity={velocityMap.get(video.id)}
+              />
             ))}
           </div>
         )}

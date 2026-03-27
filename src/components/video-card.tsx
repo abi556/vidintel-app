@@ -4,9 +4,10 @@ import { formatCompact, formatPercent, timeAgo } from "@/lib/formatters";
 
 interface VideoCardProps {
   video: VideoData;
+  velocity?: number;
 }
 
-export function VideoCard({ video }: VideoCardProps) {
+export function VideoCard({ video, velocity }: VideoCardProps) {
   return (
     <a
       href={`https://www.youtube.com/watch?v=${video.id}`}
@@ -35,7 +36,15 @@ export function VideoCard({ video }: VideoCardProps) {
           {video.title}
         </h3>
 
-        <p className="text-xs text-muted-foreground">{timeAgo(video.publishedAt)}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-muted-foreground">{timeAgo(video.publishedAt)}</p>
+          {velocity != null && velocity > 0 && (
+            <span className="flex items-center gap-0.5 text-[10px] font-medium text-accent">
+              <VelocityIcon />
+              {formatCompact(velocity)}/hr
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-3 text-xs text-muted">
           <span className="flex items-center gap-1">
@@ -93,6 +102,14 @@ function CommentIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function VelocityIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </svg>
   );
 }

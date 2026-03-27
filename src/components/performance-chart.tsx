@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { VideoData } from "@/types";
 import { formatCompact } from "@/lib/formatters";
+import { CollapsibleSection } from "./collapsible-section";
 
 interface PerformanceChartProps {
   videos: VideoData[];
@@ -48,28 +49,29 @@ export function PerformanceChart({ videos }: PerformanceChartProps) {
 
   if (videos.length < 2) return null;
 
-  return (
-    <div className="rounded-xl border border-border bg-surface p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-foreground">
-          Performance over time
-        </h3>
-        <div className="flex gap-1">
-          <MetricButton
-            active={metric === "views"}
-            onClick={() => setMetric("views")}
-          >
-            Views
-          </MetricButton>
-          <MetricButton
-            active={metric === "engagement"}
-            onClick={() => setMetric("engagement")}
-          >
-            Engagement
-          </MetricButton>
-        </div>
-      </div>
+  const metricToggle = (
+    <div className="flex gap-1">
+      <MetricButton
+        active={metric === "views"}
+        onClick={() => setMetric("views")}
+      >
+        Views
+      </MetricButton>
+      <MetricButton
+        active={metric === "engagement"}
+        onClick={() => setMetric("engagement")}
+      >
+        Engagement
+      </MetricButton>
+    </div>
+  );
 
+  return (
+    <CollapsibleSection
+      title="Performance over time"
+      defaultOpen={true}
+      headerRight={metricToggle}
+    >
       <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
@@ -122,7 +124,7 @@ export function PerformanceChart({ videos }: PerformanceChartProps) {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </CollapsibleSection>
   );
 }
 

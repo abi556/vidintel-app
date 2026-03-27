@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { VideoList } from "./video-list";
-import type { VideoData } from "@/types";
+import type { VideoData, ChannelData } from "@/types";
 
 function makeVideo(overrides: Partial<VideoData> = {}): VideoData {
   return {
@@ -17,6 +17,18 @@ function makeVideo(overrides: Partial<VideoData> = {}): VideoData {
     ...overrides,
   };
 }
+
+const MOCK_CHANNEL: ChannelData = {
+  id: "UC123",
+  title: "TestChannel",
+  description: "A test channel",
+  customUrl: "@TestChannel",
+  thumbnailUrl: "https://example.com/avatar.jpg",
+  subscriberCount: 10000,
+  videoCount: 100,
+  viewCount: 1000000,
+  uploadsPlaylistId: "UU123",
+};
 
 const MOCK_VIDEOS: VideoData[] = [
   makeVideo({
@@ -41,30 +53,32 @@ const MOCK_VIDEOS: VideoData[] = [
 
 describe("VideoList", () => {
   it("renders video cards", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
-    expect(screen.getByText("High Views")).toBeInTheDocument();
-    expect(screen.getByText("Low Views")).toBeInTheDocument();
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
+    expect(screen.getAllByText("High Views").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Low Views").length).toBeGreaterThanOrEqual(1);
   });
 
   it("displays count of visible videos", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
     expect(screen.getByText(/of 3/)).toBeInTheDocument();
   });
 
   it("filters videos by 7d range", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
     fireEvent.click(screen.getByText("7 days"));
-    expect(screen.getByText("High Views")).toBeInTheDocument();
-    expect(screen.queryByText("Low Views")).not.toBeInTheDocument();
-    expect(screen.queryByText("Old Video")).not.toBeInTheDocument();
+    expect(screen.getAllByText("High Views").length).toBeGreaterThanOrEqual(1);
+    const videoCards = screen.queryAllByRole("heading", { level: 3 });
+    const cardTitles = videoCards.map((el) => el.textContent);
+    expect(cardTitles).not.toContain("Low Views");
+    expect(cardTitles).not.toContain("Old Video");
   });
 
   it("shows all videos when All is selected", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
     fireEvent.click(screen.getByText("All"));
-    expect(screen.getByText("High Views")).toBeInTheDocument();
-    expect(screen.getByText("Low Views")).toBeInTheDocument();
-    expect(screen.getByText("Old Video")).toBeInTheDocument();
+    expect(screen.getAllByText("High Views").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Low Views").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Old Video").length).toBeGreaterThanOrEqual(1);
   });
 
   it("shows empty state when no videos match filter", () => {
@@ -74,7 +88,7 @@ describe("VideoList", () => {
         Date.now() - 100 * 24 * 60 * 60 * 1000
       ).toISOString(),
     });
-    render(<VideoList videos={[oldVideo]} channelName="TestChannel" />);
+    render(<VideoList videos={[oldVideo]} channel={MOCK_CHANNEL} />);
     fireEvent.click(screen.getByText("7 days"));
     expect(
       screen.getByText("No videos found in this date range.")
@@ -82,7 +96,7 @@ describe("VideoList", () => {
   });
 
   it("sorts by views descending by default", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
     fireEvent.click(screen.getByText("All"));
     const titles = screen
       .getAllByRole("link")
@@ -94,8 +108,8 @@ describe("VideoList", () => {
     expect(oldIdx).toBeLessThan(lowIdx);
   });
 
-  it("renders CSV export button", () => {
-    render(<VideoList videos={MOCK_VIDEOS} channelName="TestChannel" />);
-    expect(screen.getByText("Export CSV")).toBeInTheDocument();
+  it("renders export dropdown button", () => {
+    render(<VideoList videos={MOCK_VIDEOS} channel={MOCK_CHANNEL} />);
+    expect(screen.getByText("Export")).toBeInTheDocument();
   });
 });

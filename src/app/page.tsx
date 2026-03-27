@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SearchBar } from "@/components/search-bar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Logo } from "@/components/logo";
@@ -9,7 +10,15 @@ export default function Home() {
       <HomeStructuredData />
       <header className="flex items-center justify-between px-6 py-4">
         <Logo />
-        <ThemeToggle />
+        <div className="flex items-center gap-3">
+          <Link
+            href="/compare"
+            className="text-xs text-muted hover:text-foreground transition-colors"
+          >
+            Compare
+          </Link>
+          <ThemeToggle />
+        </div>
       </header>
 
       <main className="flex flex-1 flex-col items-center justify-center px-6 pb-24">
