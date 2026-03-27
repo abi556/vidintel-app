@@ -13,8 +13,8 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center px-6 pb-24">
         <div className="relative z-10 flex flex-col items-center gap-8 text-center max-w-3xl">
           <div className="animate-fade-in-up">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-1.5 text-xs font-medium text-muted">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
+            <span className="inline-flex items-center gap-2 text-xs font-medium text-muted">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
               YouTube Data API v3 &middot; Real-time analysis
             </span>
           </div>
