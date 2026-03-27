@@ -1,5 +1,36 @@
-import { describe, it, expect } from "vitest";
-import { getClientIp } from "./rate-limit";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { getClientIp, resolveChannelResolvePerMinute } from "./rate-limit";
+
+describe("resolveChannelResolvePerMinute", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("defaults to 60 when unset", () => {
+    delete process.env.RATE_LIMIT_CHANNEL_PER_MINUTE;
+    expect(resolveChannelResolvePerMinute()).toBe(60);
+  });
+
+  it("treats empty string as invalid and falls back to 60", () => {
+    vi.stubEnv("RATE_LIMIT_CHANNEL_PER_MINUTE", "");
+    expect(resolveChannelResolvePerMinute()).toBe(60);
+  });
+
+  it("treats non-numeric values as invalid and falls back to 60", () => {
+    vi.stubEnv("RATE_LIMIT_CHANNEL_PER_MINUTE", "not-a-number");
+    expect(resolveChannelResolvePerMinute()).toBe(60);
+  });
+
+  it("uses a valid numeric env value", () => {
+    vi.stubEnv("RATE_LIMIT_CHANNEL_PER_MINUTE", "120");
+    expect(resolveChannelResolvePerMinute()).toBe(120);
+  });
+
+  it("enforces a minimum of 10", () => {
+    vi.stubEnv("RATE_LIMIT_CHANNEL_PER_MINUTE", "5");
+    expect(resolveChannelResolvePerMinute()).toBe(10);
+  });
+});
 
 describe("getClientIp", () => {
   it("uses the first address in x-forwarded-for", () => {

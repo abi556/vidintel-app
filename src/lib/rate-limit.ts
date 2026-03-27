@@ -18,6 +18,15 @@ export function getClientIp(request: Request): string {
   return "unknown";
 }
 
+/**
+ * Parses `RATE_LIMIT_CHANNEL_PER_MINUTE` (default 60, minimum 10).
+ * Non-numeric or empty values fall back to 60 so the limiter never receives NaN.
+ */
+export function resolveChannelResolvePerMinute(): number {
+  const parsed = parseInt(process.env.RATE_LIMIT_CHANNEL_PER_MINUTE ?? "60", 10);
+  return Math.max(10, Number.isFinite(parsed) ? parsed : 60);
+}
+
 function createRatelimit(): Ratelimit | null {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -25,10 +34,7 @@ function createRatelimit(): Ratelimit | null {
     return null;
   }
   const redis = new Redis({ url, token });
-  const perMinute = Math.max(
-    10,
-    parseInt(process.env.RATE_LIMIT_CHANNEL_PER_MINUTE ?? "60", 10)
-  );
+  const perMinute = resolveChannelResolvePerMinute();
   return new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(perMinute, "1 m"),
